@@ -1,0 +1,120 @@
+/* 设置基本参数 */
+:root {
+  --workspace-size: 1366px;
+  --header-height: 80px;
+  --contents-height: 760px;
+}
+
+body {
+  background-color: ghostwhite;
+  display: grid;
+  place-items: center;
+}
+
+/* 设置工作区 */
+.workspace {
+  width: var(--workspace-size);
+  height: 100%;
+  background-color: lightgray;
+}
+
+/* 设置页头 */
+.header {
+  height: var(--header-height);
+  background-color: white;
+  padding: 4px;
+  margin: 2px;
+}
+
+.logo {
+  float: left;
+  height: var(--header-height);
+}
+
+.logo img {
+  height: var(--header-height);
+}
+
+/* 设置右上宽折区域，用于把一级标题挤下去 */
+.header-right-top-blank {
+  height: calc(var(--header-height) - 30px);
+}
+
+.root-dir {
+  float: left;
+  height: 26px;
+  width: 820px;
+}
+
+.root-dir a {
+  padding-left: 40px;
+  color: dimgray;
+}
+
+.search {
+  float: left;
+  width: 400px;
+}
+
+.search button {
+  margin-right: 50px;
+}
+
+.sub-dir {
+  background-color: gray;
+  padding: 4px;
+  margin: 2px;
+}
+
+.sub-dir a {
+  text-decoration: none;
+  padding-left: 40px;
+  color: white;
+}
+
+.contents {
+  min-height: var(--contents-height);
+  background-color: white;
+  margin: 2px;
+}
+
+.func-menu {
+  float: left;
+  min-height: var(--contents-height);
+  width: 200px;
+  background-color: gray;
+}
+
+.func-menu a {
+  text-decoration: none;
+  color: white;
+}
+
+.func-menu ul {
+  padding: 0;
+  margin: 20px 0 0 0;
+}
+
+.func-menu ul li {
+  list-style-type: none;
+  text-align: center;
+  padding: 4px 0;
+}
+
+.content-area {
+  min-height: var(--contents-height);
+  background-color: white;
+}
+
+.footer {
+  background-color: white;
+  padding: 4px;
+  margin: 2px;
+  text-align: right;
+}
+
+.footer a {
+  text-decoration: none;
+  color: dimgray;
+  padding-right: 40px;
+}

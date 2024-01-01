@@ -25,8 +25,6 @@ func main() {
 		}*/
 
 	router := gin.Default()
-	router.GET("/", func(c *gin.Context) {
-		c.String(200, "Hello World!")
-	})
-	router.Run("localhost:8080")
+	router.Static("/", "./static")
+	router.Run("192.168.0.104:8080")
 }
