@@ -47,6 +47,7 @@ body {
 }
 
 .root-dir a {
+  text-decoration: none;
   padding-left: 40px;
   color: dimgray;
 }
@@ -117,4 +118,32 @@ body {
   text-decoration: none;
   color: dimgray;
   padding-right: 40px;
+}
+
+/* 任务标签样式 */
+.task-label {
+  float: left;
+  width: 200px;
+  height: 80px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: gray;
+  background-color: mistyrose;
+  margin: 4px;
+  padding: 4px;
+}
+
+.task-type {
+  font-size: small;
+  height: 30px;
+}
+
+.task-name {
+  height: 35px;
+  text-align: center;
+}
+
+.label-option {
+  font-size: small;
+  text-align: right;
 }

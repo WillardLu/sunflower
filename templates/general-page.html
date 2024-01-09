@@ -6,6 +6,7 @@
   <title>有灵世界</title>
   <link rel="icon" href="images/icon.png" type="image/icon type">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="javascript" src="js/script.js">
 </head>
 
 <body>
@@ -30,7 +31,7 @@
     </header>
     <!-- 子目录 -->
     <div class="sub-dir">
-      <a href="">二级目录</a>
+      {{.sub-dir}}
     </div>
     <!-- 内容 -->
     <div class="contents">
@@ -40,7 +41,18 @@
         </ul>
       </div>
       <div class="content-area">
-        内容区域
+        <div class="task-label">
+          <div class="task-type">
+            c.function.string 
+          </div>
+          <div class="task-name">
+            AOStrCpy
+          </div>
+          <div class="label-option">
+            <a href="">修改</a>
+            <a href="">删除</a>
+          </div>
+        </div>
       </div>
     </div>
     <!-- 页脚 -->
