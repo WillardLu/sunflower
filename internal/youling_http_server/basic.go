@@ -10,9 +10,14 @@ package youling_http_server
 
 import (
 	"errors"
+	"net/http"
 	"os"
+	"strings"
 	"sunflower/pkg/youling_go_basic"
+	"sunflower/pkg/youling_string"
+	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/pelletier/go-toml"
 )
 
@@ -49,5 +54,44 @@ func readTemplates(file string, tpl map[string]string) error {
 		}
 		tpl[t.Get("name").(string)] = string(contents)
 	}
+	return nil
+}
+
+// @brief 替换模板中的占位符
+//  @param c 上下文环境
+//  @param r 路由表
+//  @param placeHolder 占位符
+//  @param templates   模板
+func replacePlaceHolder(c *gin.Context, r routers, placeHolder []interface{},
+	templates map[string]string) {
+	str := templates[r.TPL]
+	r.REPLC = templates[r.REPLC]
+
+	for _, p := range placeHolder {
+		bound := "<!--" + r.to + "." + p.(string) + "-->"
+		str = strings.Replace(str, "<!--{{."+p.(string)+"}}-->",
+			youling_string.ReadBetween(r.REPLC, bound, bound), -1)
+	}
+	c.Writer.Write([]byte(str))
+	return
+}
+
+// @brief 设置 http server 参数
+//  @param srv http服务器
+//  @return 成功：nil，失败：错误信息
+func setServer(srv *http.Server, r *gin.Engine) error {
+	// 从TOML配置文件中读取http服务器参数
+	config, err := toml.LoadFile("config/server_config.toml")
+	if err != nil {
+		return errors.New("载入 server_config.toml 文件时发生错误：" + err.Error())
+	}
+	// 服务器参数设置
+	srv.Addr = config.Get("server.address").(string) + ":" +
+		config.Get("server.port").(string)
+	srv.Handler = r
+	srv.ReadTimeout = time.Duration(config.Get("server.ReadTimeout").(int64)) *
+		time.Second
+	srv.WriteTimeout = time.Duration(config.Get("server.WriteTimeout").(int64)) *
+		time.Second
 	return nil
 }
