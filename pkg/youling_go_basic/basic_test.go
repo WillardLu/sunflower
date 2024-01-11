@@ -45,19 +45,25 @@ func TestCheckDataType(t *testing.T) {
 		"complex64", "complex128", "bool", "string", "[]int", "map[string]int",
 		"struct { Name string; Age int }", "func(int, int) int", "chan int",
 		"*errors.errorString"}
-	// 错误测试
-	t.Run("Testing error data type", func(t *testing.T) {
-		if CheckDataType("test", "int") == "" {
-			t.Errorf("[ERROR] Expected error, but no error occurred.")
-		}
-	})
 	// 一般测试
 	for i := 0; i < len(data); i++ {
 		t.Run(fmt.Sprintf("Testing %v\n", type1[i]), func(t *testing.T) {
-			msg := CheckDataType(data[i], type1[i])
-			if msg != "" {
-				t.Errorf(msg)
+			err := CheckDataType(data[i], type1[i])
+			if err != nil {
+				t.Errorf(err.Error())
 			}
 		})
 	}
+	// 错误测试
+	t.Run("Testing error data type", func(t *testing.T) {
+		if CheckDataType("test", "int") == nil {
+			t.Errorf("[ERROR] Expected error, but no error occurred.")
+		}
+	})
+	// 边界测试
+	t.Run("Testing boundary data type", func(t *testing.T) {
+		if CheckDataType(nil, "int64") != nil {
+			t.Errorf("[ERROR] Expected error, but no error occurred.")
+		}
+	})
 }

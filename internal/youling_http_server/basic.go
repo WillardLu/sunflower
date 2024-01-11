@@ -9,7 +9,7 @@
 package youling_http_server
 
 import (
-	"fmt"
+	"errors"
 	"os"
 	"sunflower/pkg/youling_go_basic"
 
@@ -17,37 +17,37 @@ import (
 )
 
 // @brief 读取模板文件
+//  @param file 模板文件
 //  @param tpl 模板哈希表
-//  @return 成功 0，失败 -1
-func readTemplates(tpl map[string]string) int {
+//  @return 成功：nil，失败：错误信息
+func readTemplates(file string, tpl map[string]string) error {
 	// 读取模板列表配置文件
-	tree, err := toml.LoadFile("config/templates_list.toml")
+	tree, err := toml.LoadFile(file)
 	if err != nil {
-		fmt.Println("载入 templates_list.toml 时发生错误：", err)
-		return -1
+		return errors.New("载入 " + file + " 文件时发生错误：" + err.Error())
 	}
 	msg := youling_go_basic.CheckDataType(tree.Get("templates"), "[]*toml.Tree")
-	if msg != "" {
-		fmt.Println("读取模板文件中的数据时发生错误：", msg)
-		return -1
+	if msg != nil {
+		return errors.New("读取模板文件中的数据时发生错误：" + msg.Error())
 	}
 	template := tree.Get("templates").([]*toml.Tree)
 	// 把模板列表中的名称与实际的文件内容逐一读入哈希表中
 	for _, t := range template {
-		msg1 := youling_go_basic.CheckDataType(t.Get("name"), "string")
-		msg2 := youling_go_basic.CheckDataType(t.Get("file"), "string")
-		if msg1 != "" || msg2 != "" {
-			fmt.Println("读取模板文件中的数据时发生错误：")
-			fmt.Println(msg1)
-			fmt.Println(msg2)
-			return -1
+		msg := youling_go_basic.CheckDataType(t.Get("name"), "string")
+		if msg != nil {
+			return errors.New("读取模板文件中的数据时发生错误\n" + msg.Error())
+		}
+		msg = youling_go_basic.CheckDataType(t.Get("file"), "string")
+		if msg != nil {
+			return errors.New("读取模板文件中的数据时发生错误\n" + msg.Error() + "\n" +
+				msg.Error())
 		}
 		contents, err := os.ReadFile(t.Get("file").(string))
 		if err != nil {
-			fmt.Println("读取模板文件“"+t.Get("file").(string)+"”时发生错误：", err)
-			return -1
+			return errors.New("读取模板文件“" + t.Get("file").(string) +
+				"”时发生错误：" + err.Error())
 		}
 		tpl[t.Get("name").(string)] = string(contents)
 	}
-	return 0
+	return nil
 }

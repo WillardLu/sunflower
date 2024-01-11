@@ -108,7 +108,7 @@ func setupRouter(router *gin.Engine) int {
 	// 2.读取模板文件内容
 	// 通过这样的方式把模板文件内容读入内存，以减少磁盘读取
 	templates := make(map[string]string)
-	if readTemplates(templates) == -1 {
+	if readTemplates("config/templates_list.toml", templates) != nil {
 		return -1
 	}
 	fmt.Println("\n载入模板文件完成……")
@@ -152,7 +152,7 @@ func setupRouter(router *gin.Engine) int {
 	}
 	// 设置刷新模板内容的路由，以方便在不用重启路由的情况下进行一些调试维护
 	router.GET("/refresh", func(c *gin.Context) {
-		readTemplates(templates)
+		readTemplates("config/templates_list.toml", templates)
 		fmt.Println("\n刷新模板文件完成……")
 	})
 	// 获取来自网页提交的内容（演示用）

@@ -37,7 +37,7 @@ func TestReadBetween(t *testing.T) {
 	// 读取测试用源字符串
 	dataType := youling_go_basic.CheckDataType(datas.Get("source_string"),
 		"*toml.Tree")
-	if dataType != "" {
+	if dataType != nil {
 		fmt.Println(dataType)
 		return
 	}
@@ -45,7 +45,7 @@ func TestReadBetween(t *testing.T) {
 	// 读取测试方案
 	dataType = youling_go_basic.CheckDataType(datas.Get("ReadBetween"),
 		"[]*toml.Tree")
-	if dataType != "" {
+	if dataType != nil {
 		fmt.Println(dataType)
 		return
 	}
@@ -55,7 +55,7 @@ func TestReadBetween(t *testing.T) {
 		dataType1 := youling_go_basic.CheckDataType(tt.Get("name"), "string")
 		dataType2 := youling_go_basic.CheckDataType(tt.Get("args.start"), "string")
 		dataType3 := youling_go_basic.CheckDataType(tt.Get("args.end"), "string")
-		if dataType1 != "" || dataType2 != "" || dataType3 != "" {
+		if dataType1 != nil || dataType2 != nil || dataType3 != nil {
 			fmt.Println(dataType1)
 			fmt.Println(dataType2)
 			fmt.Println(dataType3)
@@ -78,8 +78,23 @@ func TestReadBetween(t *testing.T) {
 		})
 	}
 	// 错误测试
-	t.Run("错误测试", func(t *testing.T) {
+	t.Run("错误测试：返回内容不符", func(t *testing.T) {
 		if got := ReadBetween("inbox/id/AQQkAD", "/id/AQQ", "d/AQQk"); got != "" {
+			t.Errorf("ReadBetween() = %v, want %v", got, "")
+		}
+	})
+	t.Run("错误测试：开头字符找不到", func(t *testing.T) {
+		if got := ReadBetween("inbox/id/AQQkAD", "/id/1AQQ", "d/AQQk"); got != "" {
+			t.Errorf("ReadBetween() = %v, want %v", got, "")
+		}
+	})
+	t.Run("错误测试：结尾字符找不到", func(t *testing.T) {
+		if got := ReadBetween("inbox/id/AQQkAD", "/id/AQQ", "d1/AQQk"); got != "" {
+			t.Errorf("ReadBetween() = %v, want %v", got, "")
+		}
+	})
+	t.Run("错误测试：结尾字符在开头字符之前", func(t *testing.T) {
+		if got := ReadBetween("inbox/id/AQQkAD", "/id/AQQ", "inbox"); got != "" {
 			t.Errorf("ReadBetween() = %v, want %v", got, "")
 		}
 	})
