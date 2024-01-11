@@ -6,13 +6,4 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
-package main
-
-import (
-	"sunflower/internal/youling_http_server"
-)
-
-func main() {
-	youling_http_server.CreateHttpServer()
-	return
-}
+package youling_http_server

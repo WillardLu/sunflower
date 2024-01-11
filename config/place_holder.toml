@@ -1,0 +1,12 @@
+# 占位符列表
+
+homepage = [
+  "subdir",
+  "funcmenu"
+]
+
+task-list = [
+  "subdir",
+  "funcmenu",
+  "contents"
+]

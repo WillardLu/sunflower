@@ -1,0 +1,46 @@
+# ReadBetween函数单元测试数据
+[source_string]
+str1 = "greetings_test.go:15: Hello(\"Gladys\") = \"Hail, %v! Well met!\", <nil>, want match for `\bGladys\b`, nil"
+str2 = "蒹葭苍苍，白露为霜。Reeds green, white dew for frost. 所谓伊人，在水一方。That person of whom I think is on the water somewhere."
+
+[[ReadBetween]]
+source = "str1"
+name = "ASCII测试1：开头与结尾字符都不靠边"
+args = {start = "Hello", end = "want"}
+want = "(\"Gladys\") = \"Hail, %v! Well met!\", <nil>, "
+
+[[ReadBetween]]
+source = "str1"
+name = "ASCII测试2：开头与结尾字符在两边"
+args = {start = "greetings", end = " nil"}
+want = "_test.go:15: Hello(\"Gladys\") = \"Hail, %v! Well met!\", <nil>, want match for `\bGladys\b`,"
+
+[[ReadBetween]]
+source = "str2"
+name = "汉英混合测试1：开头与结尾字符都不靠边"
+args = {start = "白露为霜。R", end = "一方。That person"}
+want = "eeds green, white dew for frost. 所谓伊人，在水"
+
+[[ReadBetween]]
+source = "str2"
+name = "汉英混合测试2：开头与结尾字符在两边"
+args = {start = "蒹葭苍苍，白露为霜。Re", end = " somewhere."}
+want = "eds green, white dew for frost. 所谓伊人，在水一方。That person of whom I think is on the water"
+
+[[ReadBetween]]
+source = "str1"
+name = "边界测试1"
+args = {start = "", end = ""}
+want = "greetings_test.go:15: Hello(\"Gladys\") = \"Hail, %v! Well met!\", <nil>, want match for `\bGladys\b`, nil"
+
+[[ReadBetween]]
+source = "str1"
+name = "边界测试2"
+args = {start = "", end = " want"}
+want = "greetings_test.go:15: Hello(\"Gladys\") = \"Hail, %v! Well met!\", <nil>,"
+
+[[ReadBetween]]
+source = "str1"
+name = "边界测试3"
+args = {start = "Hail, ", end = ""}
+want = "%v! Well met!\", <nil>, want match for `\bGladys\b`, nil"
