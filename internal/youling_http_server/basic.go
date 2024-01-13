@@ -10,10 +10,10 @@ package youling_http_server
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
-	"sunflower/pkg/youling_go_basic"
 	"sunflower/pkg/youling_string"
 	"time"
 
@@ -21,69 +21,122 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
+type Template struct {
+	Name string
+	File string
+}
+
+type Tpl struct {
+	Templates []Template
+}
+
+type PH struct {
+	Name     string
+	Contents []string
+}
+
+type PHs struct {
+	Place_holder []PH
+}
+
 // @brief 读取模板文件
 //  @param file 模板文件
 //  @param tpl 模板哈希表
 //  @return 成功：nil，失败：错误信息
-func readTemplates(file string, tpl map[string]string) error {
+func readTemplates(f string, tpl map[string]string) error {
 	// 读取模板列表配置文件
-	tree, err := toml.LoadFile(file)
+	conf, err := toml.LoadFile(f)
 	if err != nil {
-		return errors.New("载入 " + file + " 文件时发生错误：" + err.Error())
+		return errors.New("载入模板配置文件 " + f + " 失败。")
 	}
-	msg := youling_go_basic.CheckDataType(tree.Get("templates"), "[]*toml.Tree")
-	if msg != nil {
-		return errors.New("读取模板文件中的数据时发生错误：" + msg.Error())
+	// 解析模板列表配置文件
+	if fmt.Sprintf("%T", conf.Get("templates")) != "[]*toml.Tree" {
+		return errors.New("模板配置文件 " + f + " 中找不到 templates 表头。")
 	}
-	template := tree.Get("templates").([]*toml.Tree)
+	tp1 := conf.Get("templates").([]*toml.Tree)
+	var tp Tpl
+	for _, v := range tp1 {
+		if fmt.Sprintf("%T", v.Get("name")) != "string" {
+			return errors.New("模板配置文件 " + f + " 中 name 字段找不到。")
+		}
+		name := v.Get("name").(string)
+		if fmt.Sprintf("%T", v.Get("file")) != "string" {
+			return errors.New("模板配置文件 " + f + " 中 file 字段找不到。")
+		}
+		file := v.Get("file").(string)
+		tp.Templates = append(tp.Templates, Template{Name: name, File: file})
+	}
 	// 把模板列表中的名称与实际的文件内容逐一读入哈希表中
-	for _, t := range template {
-		msg := youling_go_basic.CheckDataType(t.Get("name"), "string")
-		if msg != nil {
-			return errors.New("读取模板文件中的数据时发生错误\n" + msg.Error())
-		}
-		msg = youling_go_basic.CheckDataType(t.Get("file"), "string")
-		if msg != nil {
-			return errors.New("读取模板文件中的数据时发生错误\n" + msg.Error() + "\n" +
-				msg.Error())
-		}
-		contents, err := os.ReadFile(t.Get("file").(string))
+	for _, t := range tp.Templates {
+		contents, err := os.ReadFile(t.File)
 		if err != nil {
-			return errors.New("读取模板文件“" + t.Get("file").(string) +
-				"”时发生错误：" + err.Error())
+			return errors.New("读取模板文件 " + t.File + " 失败。")
 		}
-		tpl[t.Get("name").(string)] = string(contents)
+		tpl[t.Name] = string(contents)
+	}
+	return nil
+}
+
+// @brief 读取占位符列表
+//  @param file 占位符配置文件
+//  @param ph 占位符列表
+//  @return 成功：nil，失败：错误信息
+func readPlaceHolderList(file string, ph map[string][]string) error {
+	// 读取占位符列表配置文件
+	conf, err := toml.LoadFile(file)
+	if err != nil {
+		return errors.New("载入占位符文件 " + file + " 时发生错误：")
+	}
+	if fmt.Sprintf("%T", conf.Get("place_holder")) != "[]*toml.Tree" {
+		return errors.New("占位符配置文件 " + file + " 中找不到 place_holder 表头。")
+	}
+	phs := conf.Get("place_holder").([]*toml.Tree)
+	var ph1 PHs
+	for _, v := range phs {
+		if fmt.Sprintf("%T", v.Get("name")) != "string" {
+			return errors.New("占位符配置文件 " + file + " 中找不到 name 字段。")
+		}
+		name := v.Get("name").(string)
+		if fmt.Sprintf("%T", v.Get("contents")) != "[]interface {}" {
+			return errors.New("占位符配置文件 " + file + " 中找不到 contents 字段。")
+		}
+		contentsTemp := v.Get("contents").([]interface{})
+		var contents []string
+		for _, w := range contentsTemp {
+			contents = append(contents, w.(string))
+		}
+		ph1.Place_holder = append(ph1.Place_holder, PH{Name: name,
+			Contents: contents})
+	}
+	for _, p := range ph1.Place_holder {
+		ph[p.Name] = p.Contents
 	}
 	return nil
 }
 
 // @brief 替换模板中的占位符
-//  @param c 上下文环境
 //  @param r 路由表
 //  @param placeHolder 占位符
 //  @param templates   模板
-func replacePlaceHolder(c *gin.Context, r routers, placeHolder []interface{},
-	templates map[string]string) {
-	str := templates[r.TPL]
-	r.REPLC = templates[r.REPLC]
-
+//  @return 页面内容
+func replacePlaceHolder(r Router, placeHolder []string,
+	template string, replacement string) string {
 	for _, p := range placeHolder {
-		bound := "<!--" + r.to + "." + p.(string) + "-->"
-		str = strings.Replace(str, "<!--{{."+p.(string)+"}}-->",
-			youling_string.ReadBetween(r.REPLC, bound, bound), -1)
+		bound := "<!--" + r.Function + "." + p + "-->"
+		template = strings.Replace(template, "<!--{{."+p+"}}-->",
+			youling_string.ReadBetween(replacement, bound, bound), -1)
 	}
-	c.Writer.Write([]byte(str))
-	return
+	return template
 }
 
 // @brief 设置 http server 参数
 //  @param srv http服务器
 //  @return 成功：nil，失败：错误信息
-func setServer(srv *http.Server, r *gin.Engine) error {
+func setServer(file string, srv *http.Server, r *gin.Engine) error {
 	// 从TOML配置文件中读取http服务器参数
-	config, err := toml.LoadFile("config/server_config.toml")
+	config, err := toml.LoadFile(file)
 	if err != nil {
-		return errors.New("载入 server_config.toml 文件时发生错误：" + err.Error())
+		return errors.New("载入服务器参数文件 server_config.toml 时发生错误。")
 	}
 	// 服务器参数设置
 	srv.Addr = config.Get("server.address").(string) + ":" +

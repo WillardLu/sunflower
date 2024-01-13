@@ -4,5 +4,5 @@ name = "homepage"
 contents = ["subdir", "funcmenu"]
 
 [[place_holder]]
-name = "task-list"
+name1 = "task-list"
 contents = ["subdir", "funcmenu", "contents"]

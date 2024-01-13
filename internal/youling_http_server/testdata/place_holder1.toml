@@ -1,8 +1,8 @@
 # 占位符列表
-[[place_holder]]
+[[place_holder6]]
 name = "homepage"
 contents = ["subdir", "funcmenu"]
 
-[[place_holder]]
+[[place_holder0]]
 name = "task-list"
 contents = ["subdir", "funcmenu", "contents"]

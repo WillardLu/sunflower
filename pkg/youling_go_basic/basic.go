@@ -8,15 +8,11 @@
 // https://opensource.org/licenses/MIT.
 package youling_go_basic
 
-import (
-	"errors"
-	"fmt"
-)
-
 // @brief 检查类型是否为nil或者是否与预期的数据类型相符
 //  @param data 要检查类型的数据
 //  @param expectedDataType 预期的数据类型
 //  @return 成功：nil，失败：错误信息
+/*
 func CheckDataType(data interface{}, expectedDataType string) error {
 	dataType := fmt.Sprintf("%T", data)
 	if dataType == "<nil>" {
@@ -29,3 +25,4 @@ func CheckDataType(data interface{}, expectedDataType string) error {
 	}
 	return nil
 }
+*/

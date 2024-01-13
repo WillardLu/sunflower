@@ -8,12 +8,7 @@
 // https://opensource.org/licenses/MIT.
 package youling_go_basic
 
-import (
-	"errors"
-	"fmt"
-	"testing"
-)
-
+/*
 // @brief 测试CheckingDataType函数
 func TestCheckDataType(t *testing.T) {
 	// 基础数据类型
@@ -67,3 +62,4 @@ func TestCheckDataType(t *testing.T) {
 		}
 	})
 }
+*/

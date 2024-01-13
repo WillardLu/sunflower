@@ -1,12 +1,59 @@
-# 路由关系表
+# 路由配置表
+#  设置静态文件位置
 [[routing]]
-  from = "/"
-  to = "homepage"
-  template = "general1"
-  replacement = "replacement"
+type = "static"
+path = "/css"
+function = "nil"
+template = "nil"
+replacement = "nil"
+dir = "./static/css"
 
 [[routing]]
-  from = "/task-list"
-  to = "task-list"
-  template = "general1"
-  replacement = "replacement"
+type = "static"
+path = "/images"
+function = "nil"
+template = "nil"
+replacement = "nil"
+dir = "./static/images"
+
+[[routing]]
+type = "static"
+path = "/js"
+function = "nil"
+template = "nil"
+replacement = "nil"
+dir = "./static/js"
+
+#  设置通过模板文件生成的类型
+[[routing]]
+type = "template"
+path = "/"
+function = "homepage"
+template = "general1"
+replacement = "replacement"
+dir = "nil"
+
+[[routing]]
+type = "template"
+path = "/task-list"
+function = "task-list"
+template = "general1"
+replacement = "replacement"
+dir = "nil"
+
+#  设置执行函数的类型
+[[routing]]
+type = "function"
+path = "/refresh"
+function = "refreshTemplates"
+template = "nil"
+replacement = "nil"
+dir = "nil"
+
+[[routing]]
+type = "function"
+path = "/submit-data"
+function = "handleData"
+template = "nil"
+replacement = "nil"
+dir = "nil"

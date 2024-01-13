@@ -10,7 +10,6 @@ package youling_string
 
 import (
 	"fmt"
-	"sunflower/pkg/youling_go_basic"
 	"testing"
 
 	"github.com/pelletier/go-toml"
@@ -31,49 +30,60 @@ func TestReadBetween(t *testing.T) {
 	// 从TOML文件中读取测试数据
 	datas, err := toml.LoadFile("testdata/test_data.toml")
 	if err != nil {
-		fmt.Println("\n载入测试数据文件 test_data/test_data.toml 时发生错误：", err)
+		t.Error("\n载入测试数据文件 test_data/test_data.toml 时发生错误：", err)
 		return
 	}
 	// 读取测试用源字符串
-	dataType := youling_go_basic.CheckDataType(datas.Get("source_string"),
-		"*toml.Tree")
-	if dataType != nil {
-		fmt.Println(dataType)
+	var type1 interface{}
+	type1 = datas.Get("source_string")
+	if fmt.Sprintf("%T", type1) != "*toml.Tree" {
+		t.Error("测试数据中没有找到 source_string 表")
 		return
 	}
-	source := datas.Get("source_string").(*toml.Tree)
+	source := type1.(*toml.Tree)
 	// 读取测试方案
-	dataType = youling_go_basic.CheckDataType(datas.Get("ReadBetween"),
-		"[]*toml.Tree")
-	if dataType != nil {
-		fmt.Println(dataType)
+	type1 = datas.Get("ReadBetween")
+	if fmt.Sprintf("%T", type1) != "[]*toml.Tree" {
+		t.Error("测试数据中没有找到 ReadBetween 表数组")
 		return
 	}
-	testSchemes := datas.Get("ReadBetween").([]*toml.Tree)
-	var testData tests
+	testSchemes := type1.([]*toml.Tree)
+	// 读取测试数据
+	var tData tests
 	for _, tt := range testSchemes {
-		dataType1 := youling_go_basic.CheckDataType(tt.Get("name"), "string")
-		dataType2 := youling_go_basic.CheckDataType(tt.Get("args.start"), "string")
-		dataType3 := youling_go_basic.CheckDataType(tt.Get("args.end"), "string")
-		if dataType1 != nil || dataType2 != nil || dataType3 != nil {
-			fmt.Println(dataType1)
-			fmt.Println(dataType2)
-			fmt.Println(dataType3)
+		type1 := tt.Get("name")
+		if fmt.Sprintf("%T", type1) != "string" {
+			t.Error("测试数据中 ReadBetween 表里面没有找到 name 字段")
 			return
 		}
-		testData = tests{
-			name: tt.Get("name").(string),
+		type2 := tt.Get("args.start")
+		if fmt.Sprintf("%T", type2) != "string" {
+			t.Error("测试数据中 ReadBetween 表里面没有找到 args.start 字段")
+			return
+		}
+		type3 := tt.Get("args.end")
+		if fmt.Sprintf("%T", type3) != "string" {
+			t.Error("测试数据中 ReadBetween 表里面没有找到 args.end 字段")
+			return
+		}
+		s1 := tt.Get("source")
+		if fmt.Sprintf("%T", s1) != "string" {
+			t.Error("测试数据中 ReadBetween 表里面没有找到 source 字段")
+			return
+		}
+		tData = tests{
+			name: type1.(string),
 			args: args{
-				s:     source.Get(tt.Get("source").(string)).(string),
-				start: tt.Get("args.start").(string),
-				end:   tt.Get("args.end").(string),
+				s:     source.Get(s1.(string)).(string),
+				start: type2.(string),
+				end:   type3.(string),
 			},
 			want: tt.Get("want").(string),
 		}
-		t.Run(testData.name, func(t *testing.T) {
-			if got := ReadBetween(testData.args.s, testData.args.start,
-				testData.args.end); got != testData.want {
-				t.Errorf("ReadBetween() = %v, want %v", got, testData.want)
+		t.Run(tData.name, func(t *testing.T) {
+			got := ReadBetween(tData.args.s, tData.args.start, tData.args.end)
+			if got != tData.want {
+				t.Errorf("ReadBetween() = %v, want %v", got, tData.want)
 			}
 		})
 	}
